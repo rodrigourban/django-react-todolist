@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
+import Modal from "./components/Modal";
 const todoItems = [
   {
     id: 1,
@@ -29,8 +29,31 @@ const todoItems = [
 ];
 class App extends Component {
   state = {
+    modal: false,
     viewCompleted: false,
-    todoList: todoItems
+    todoList: todoItems,
+    activeItem: {
+      title: "",
+      description: "",
+      completed: false
+    }
+  };
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  };
+  handleSubmit = item => {
+    this.toggle();
+    alert("save" + JSON.stringify(item));
+  };
+  handleDelete = item => {
+    alert("delete" + JSON.stringify(item));
+  };
+  createItem = () => {
+    const item = { title: "", description: "", completed: false };
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+  editItem = item => {
+    this.setState({ activeItem: item, modal: !this.state.modal });
   };
   displayCompleted = status => {
     if (status) {
@@ -70,12 +93,23 @@ class App extends Component {
           className={`todo-title mr-2 ${
             this.state.viewCompleted ? "completed-todo" : ""
           }`}
+          title={item.description}
         >
           {item.title}
         </span>
         <span>
-          <button className="btn btn-secondary mr-2">Edit</button>
-          <button className="btn btn-danger">Delete</button>
+          <button
+            className="btn btn-secondary mr-2"
+            onClick={() => this.editItem(item)}
+          >
+            Edit
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => this.handleDelete(item)}
+          >
+            Delete
+          </button>
         </span>
       </li>
     ));
@@ -88,7 +122,9 @@ class App extends Component {
           <div className="col-md-6 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="">
-                <button className="btn btn-primary">Add task</button>
+                <button className="btn btn-primary" onClick={this.createItem}>
+                  Add task
+                </button>
               </div>
               {this.renderTabList()}
               <ul className="list-group list-group-flush">
@@ -97,6 +133,13 @@ class App extends Component {
             </div>
           </div>
         </div>
+        {this.state.modal ? (
+          <Modal
+            activeItem={this.state.activeItem}
+            toggle={this.toggle}
+            onSave={this.handleSubmit}
+          />
+        ) : null}
       </main>
     );
   }
