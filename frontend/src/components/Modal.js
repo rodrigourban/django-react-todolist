@@ -24,7 +24,7 @@ export default class CustomModal extends Component {
     this.setState({ activeItem });
   };
   render() {
-    const { toggle, isOpen } = this.props;
+    const { toggle } = this.props;
     return (
       <Modal isOpen={true} toggle={toggle}>
         <ModalHeader toggle={toggle}> Todo Item</ModalHeader>

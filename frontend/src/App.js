@@ -1,52 +1,50 @@
 import React, { Component } from "react";
+import axios from "axios";
 import "./App.css";
 import Modal from "./components/Modal";
-const todoItems = [
-  {
-    id: 1,
-    title: "Go to Market",
-    description: "Buy ingredients to prepare dinner",
-    completed: true
-  },
-  {
-    id: 2,
-    title: "Study",
-    description: "Read Algebra and History textbook for upcoming test",
-    completed: false
-  },
-  {
-    id: 3,
-    title: "Sally's books",
-    description: "Go to library to rent sally's books",
-    completed: true
-  },
-  {
-    id: 4,
-    title: "Article",
-    description: "Write article on how to use django with react",
-    completed: false
-  }
-];
+
 class App extends Component {
   state = {
     modal: false,
     viewCompleted: false,
-    todoList: todoItems,
+    todoList: [],
     activeItem: {
       title: "",
       description: "",
       completed: false
     }
   };
+  componentDidMount() {
+    this.refreshList();
+  }
+  refreshList = () => {
+    axios
+      .get("/api/todos/")
+      .then(res => this.setState({ todoList: res.data }))
+      .catch(err => console.log(err));
+  };
   toggle = () => {
     this.setState({ modal: !this.state.modal });
   };
   handleSubmit = item => {
     this.toggle();
-    alert("save" + JSON.stringify(item));
+    if (item.id) {
+      axios
+        .put(`/api/todos/${item.id}/`, item)
+        .then(res => this.refreshList())
+        .catch(err => console.log(err));
+      return;
+    }
+    axios
+      .post("/api/todos/", item)
+      .then(res => this.refreshList())
+      .catch(err => console.log(err));
   };
   handleDelete = item => {
-    alert("delete" + JSON.stringify(item));
+    axios
+      .delete(`/api/todos/${item.id}`)
+      .then(res => this.refreshList())
+      .catch(err => console.log(err));
   };
   createItem = () => {
     const item = { title: "", description: "", completed: false };
